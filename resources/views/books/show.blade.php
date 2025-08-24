@@ -13,7 +13,7 @@
                     @endif
                     <div class="card-body">
                         <h2 class="card-title">{{ $book->title }}</h2>
-                        <h5 class="text-muted mb-3">Автор: {{ $book->author->name }}</h5>
+                        <h5 class="text-muted mb-3">Автор: {{ $book->author->second_name . " " . $book->author->first_name . " " . $book->author->patronymic }}</h5>
 
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item"><strong>Год:</strong> {{ $book->year }}</li>

@@ -17,14 +17,16 @@
                             <div class="form-group mb-4">
                                 <label for="inputEmail">Email</label>
                                 <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="Введите email">
+                                @error('second_name')
+                                <div class="text-red-500">{{ "Длина должна быть от 3 до 255" }}</div>
+                                @enderror
                             </div>
                             <div class="form-group mb-4">
                                 <label for="inputPassword">Пароль</label>
                                 <input type="password" class="form-control" name="password" placeholder="Пароль">
-                            </div>
-                            <div class="form-group form-check mb-4">
-                                <input type="checkbox" class="form-check-input" id="rememberCheck">
-                                <label class="form-check-label" for="rememberCheck">Запомнить меня</label>
+                                @error('second_name')
+                                <div class="text-red-500">{{ "Длина должна быть от 8 до 255" }}</div>
+                                @enderror
                             </div>
                             <button type="submit" class="btn btn-primary">Войти</button>
                         </form>

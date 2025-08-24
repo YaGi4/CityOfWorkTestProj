@@ -2,114 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CreateBookRequest;
-use App\Http\Requests\UpdateAuthorRequest;
-use App\Http\Requests\UpdateBookRequest;
+use App\Http\Requests\SaveBookRequest;
 use App\Models\Author;
 use App\Models\Book;
-use Illuminate\Database\Eloquent\Builder;
+use App\Services\BookService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class BookController extends Controller
+final class BookController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(
+        private readonly BookService $bookService
+    ) {}
+
+    public function index(Request $request): View
     {
         if (empty($request->query())) {
             $books = Book::paginate(9);
-            $books->withPath('/books');
-            return view('books.index', compact('books'));
         } else {
-
-            $query = Book::query();
-
-            if ($request->filled('author_name')) {
-                $authorName = $request->string('author_name')->trim();
-
-                $query->whereHas('author', function (Builder $subQuery) use ($authorName) {
-                    $subQuery->where('first_name', 'like', "%{$authorName}%")
-                        ->orWhere('second_name', 'like', "%{$authorName}%")
-                        ->orWhere('patronymic', 'like', "%{$authorName}%");
-                });
-            }
-
-            if ($request->filled('year')) {
-                $query->where('year', $request->string('year')->trim());
-            }
-
-            if ($request->filled('genre')) {
-                $query->where('genre', 'like', '%' . $request->string('genre')->trim() . '%');
-            }
-
+            $query = $this->bookService->getBooksWithQuery($request);
             $books = $query->paginate(9);
-            $books->withPath('/books');
-            return view('books.index', compact('books'));
         }
+        return view('books.index', compact('books'));
     }
 
-    public function create()
+    public function create(): View
     {
-        $authors = Author::all();
-        return view('books.form', compact('authors'));
+        return view('books.form');
     }
 
-    public function store(CreateBookRequest $request)
+    public function store(SaveBookRequest $request): RedirectResponse
     {
-        $data = $request->validated();
-
-        $author = Author::findOrFail($request->request->all()['author_id']);
-
-        if ($request->hasFile('cover')) {
-            $path = $request->file('cover')->store('books/covers', 'public');
-            $data['cover'] = $path;
-        }
-
-        $data['author_id'] = $author->id;
-
-        Book::create($data);
-
-        return redirect()->route('books.index')->with('success', 'Книга добавлена!');
+        $this->bookService->createBook($request->data());
+        return redirect()->route('books.index');
     }
 
-    public function show(Book $book)
+    public function show(Book $book): View
     {
         return view('books.show', compact('book'));
     }
 
-    public function edit(Book $book)
+    public function edit(Book $book): View
     {
-        $authors = Author::all();
-        return view('books.form', compact('book', 'authors'));
+        return view('books.form', compact('book'));
     }
 
-    public function update(UpdateBookRequest $request, Book $book)
+    public function update(SaveBookRequest $request, Book $book): RedirectResponse
     {
-        $data = $request->validated();
-
-        $author = Author::findOrFail($request->request->all()['author_id']);
-
-        $data['author_id'] = $author->id;
-
-
-        if ($request->hasFile('cover')) {
-            if ($book->cover) {
-                Storage::disk('public')->delete($book->cover);
-            }
-            $path = $request->file('cover')->store('books/covers', 'public');
-            $data['cover'] = $path;
-        }
-
-        $book->update($data);
-
-        return redirect()->route('books.index')->with('success', 'Книга обновлена!');
+        $this->bookService->updateBook($book, $request->data());
+        return redirect()->route('books.index');
     }
 
-    public function destroy(Book $book)
+    public function destroy(Book $book): RedirectResponse
     {
-        if ($book->cover) {
-            Storage::disk('public')->delete($book->cover);
-        }
-        $book->delete();
+        $this->bookService->deleteBook($book);
         return redirect()->route('books.index')->with('success', 'Книга удалена!');
     }
 }

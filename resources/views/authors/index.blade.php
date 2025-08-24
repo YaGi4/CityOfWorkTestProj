@@ -35,4 +35,10 @@
         @endforeach
         </tbody>
     </table>
+
+    @if($authors->hasPages())
+        <div class="mb-4">
+            {{ $authors->links() }}
+        </div>
+    @endif
 @endsection

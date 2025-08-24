@@ -12,28 +12,29 @@
 
     <div class="row">
         <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Сортировка</h5>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('books.index') }}" method="GET" enctype="text/plain">
+            <form action="{{ route('books.index') }}" method="GET" enctype="text/plain">
+
+                <div class="card mb-4 mt-1">
+                    <div class="card-header">
+                        <h5 class="mb-0">Фильтрация</h5>
+                    </div>
+                    <div class="card-body">
                         <div class="input-group mb-3">
-                            <div class="mb-3">
+                            <div class="mb-3 w-100">
                                 <label class="form-label">Автор:</label>
                                 <input type="text" name="author_name" class="form-control"
                                     @if(request()->filled('author_name'))
                                         value="{{ request()->string('author_name')->trim() }}"
                                     @endif>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 w-100">
                                 <label class="form-label">Год:</label>
                                 <input type="text" name="year" class="form-control"
                                     @if(request()->filled('year'))
                                         value="{{ request()->string('year')->trim() }}"
                                     @endif>
                             </div>
-                            <div class="mb-3">
+                            <div class="mb-3 w-100">
                                 <label class="form-label">Жанр:</label>
                                 <input type="text" name="genre" class="form-control"
                                     @if(request()->filled('genre'))
@@ -41,15 +42,40 @@
                                     @endif>
                             </div>
                         </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Применить</button>
-                            @if(request()->anyFilled('author_name', 'year', 'genre'))
-                                <a href="{{ route('books.index') }}" class="btn btn-outline-secondary">Сбросить</a>
-                            @endif
-                        </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
+
+                <div class="card mb-4 ">
+                    <div class="card-header">
+                        <h5 class="mb-0">Сортировка</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <div class="mb-4">
+                                <label class="form-label" for="inputGroupSelect01">Сортировать по:</label>
+                                <select class="w-100 border-1 rounded-sm border-gray-300 p-2" name="sort" onchange="this.form.submit()">
+                                    <option {{ request()->missing('sort') ? 'selected' : '' }}>Сортировать по...</option>
+                                    <option value="author_asc"  {{ request('sort') == 'author_asc' ? 'selected' : '' }}>Автор ↑</option>
+                                    <option value="author_desc" {{ request('sort') == 'author_desc' ? 'selected' : '' }}>Автор ↓</option>
+                                    <option value="year_asc"    {{ request('sort') == 'year_asc' ? 'selected' : '' }}>Год ↑</option>
+                                    <option value="year_desc"   {{ request('sort') == 'year_desc' ? 'selected' : '' }}>Год ↓</option>
+                                    <option value="genre_asc"   {{ request('sort') == 'genre_asc' ? 'selected' : '' }}>Жанр ↑</option>
+                                    <option value="genre_desc"  {{ request('sort') == 'genre_desc' ? 'selected' : '' }}>Жанр ↓</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Применить</button>
+                    @if(request()->anyFilled('author_name', 'year', 'genre', 'sort'))
+                        <a href="{{ route('books.index') }}" class="btn btn-outline-secondary">Сбросить</a>
+                    @endif
+                </div>
+
+            </form>
+
         </div>
 
         <div class="col-md-9">

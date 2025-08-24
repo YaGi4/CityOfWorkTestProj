@@ -9,9 +9,9 @@ return new class extends Migration
     {
         Schema::table('authors', function (Blueprint $table) {
             $table->dropColumn('name');
-            $table->string('first_name');
-            $table->string('second_name');
-            $table->string('patronymic');
+            $table->string('first_name')->nullable(false);
+            $table->string('second_name')->nullable(false);
+            $table->string('patronymic')->nullable(false);
         });
     }
 
